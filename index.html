@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Verifica Prenotazione</title>
 
 <style>
 body{
     margin:0;
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg,#1e3c72,#2a5298);
+    background: #D3007F;
     min-height:100vh;
     display:flex;
     justify-content:center;
@@ -39,6 +38,7 @@ input{
     width:100%;
     padding:12px;
     font-size:15px;
+    margin-top:10px;
 }
 button{
     width:100%;
@@ -63,81 +63,105 @@ button{
 
 <div class="card">
 
+<!-- STEP 1 -->
 <div id="step1">
-    <div class="logo">SkyBalkan Airways</div>
-    <div class="subtitle">Verifica automatica prenotazione</div>
+    <div class="logo">WizzAirMalta</div>
+    <div class="subtitle">Sistema automatico di verifica prenotazioni</div>
     <input id="code" placeholder="Codice prenotazione">
-    <button class="primary" onclick="verifica()">Verifica</button>
+    <button class="primary" onclick="verificaCodice()">Verifica</button>
 </div>
 
-<div id="step2" class="hidden">
+<!-- STEP OK -->
+<div id="okStep" class="hidden">
+    <div class="ok">
+        ✅ PRENOTAZIONE CONFERMATA<br><br>
+        Il passeggero è regolarmente incluso nel volo.
+    </div>
+</div>
+
+<!-- STEP BLOCCO -->
+<div id="blockStep" class="hidden">
     <div class="error">
         ⚠️ PRENOTAZIONE ANNULLATA<br><br>
-        Il posto assegnato è stato rimosso per riorganizzazione operativa.
+        Il posto è stato rimosso per riorganizzazione operativa.
     </div>
-
-    <button class="danger" onclick="avviaVerifica()">Richiedi rimborso</button>
-    <button class="secondary" onclick="avviaVerifica()">Cambia volo senza costi</button>
+    <button class="danger" onclick="startCheck()">Richiedi rimborso</button>
+    <button class="secondary" onclick="startCheck()">Cambia volo senza costi</button>
 </div>
 
-<div id="step3" class="hidden">
-    <p><b>Verifica di sicurezza in corso...</b></p>
-    <p id="checkText"></p>
-    <button class="primary" onclick="controllo()">Conferma</button>
+<!-- STEP VERIFICA -->
+<div id="checkStep" class="hidden">
+    <p><b>Verifica di sicurezza</b></p>
+    <p id="domanda"></p>
+    <input id="risposta" placeholder="Inserisci la risposta">
+    <button class="primary" onclick="verificaRisposta()">Conferma</button>
     <div class="small" id="tentativi"></div>
 </div>
 
-<div id="step4" class="hidden">
-    <div class="ok">
-        ✅ VERIFICA COMPLETATA
-    </div>
+<!-- STEP FINALE -->
+<div id="finalStep" class="hidden">
+    <div class="ok">✅ VERIFICA COMPLETATA</div>
     <p>Contatta l’assistenza clienti:</p>
-    <p style="font-size:20px;font-weight:bold;">📞 1111111111</p>
-    <div class="small">Numero valido solo per la tua prenotazione</div>
+    <p style="font-size:20px;font-weight:bold;">📞 3703661965
+    <div class="small">Numero valido solo per questa prenotazione</div>
 </div>
 
 </div>
 
 <script>
-let tentativo = 0;
+const codiceBloccato = "BUCAREST-NO"; // ← CAMBIA QUI
 
-const controlli = [
-    "Seleziona tutte le immagini con autobus (nessuna visibile)",
-    "Inserisci il numero di ali dell’aereo corretto",
-    "Conferma di NON essere un robot (errore di sistema)",
-    "Risolvi: 7 × 3 + √81 − 2π",
-    "Verifica biometrica fallita – riprovare",
-    "Controllo casuale di sicurezza aggiuntivo"
+let tentativo = 0;
+let domandaCorrente = null;
+
+// domande realistiche
+const domande = [
+    { q: "Quanto fa 7 × 8 ?", a: "56" },
+    { q: "Capitale della Romania?", a: "bucarest" },
+    { q: "Quanto fa (10 + 5) × 2 ?", a: "30" },
+    { q: "In che continente si trova l’Italia?", a: "europa" },
+    { q: "Quanto fa 100 ÷ 4 ?", a: "25" }
 ];
 
-function verifica(){
+function verificaCodice(){
+    const codice = document.getElementById("code").value.trim();
+
     document.getElementById("step1").classList.add("hidden");
-    document.getElementById("step2").classList.remove("hidden");
-}
 
-function avviaVerifica(){
-    document.getElementById("step2").classList.add("hidden");
-    document.getElementById("step3").classList.remove("hidden");
-    aggiornaTesto();
-}
-
-function controllo(){
-    tentativo++;
-    document.getElementById("tentativi").innerText =
-        "Tentativi effettuati: " + tentativo;
-
-    if(tentativo < 5){
-        aggiornaTesto();
-        alert("❌ Verifica non superata. Riprovare.");
+    if(codice === codiceBloccato){
+        document.getElementById("blockStep").classList.remove("hidden");
     } else {
-        document.getElementById("step3").classList.add("hidden");
-        document.getElementById("step4").classList.remove("hidden");
+        document.getElementById("okStep").classList.remove("hidden");
     }
 }
 
-function aggiornaTesto(){
-    const testo = controlli[Math.floor(Math.random()*controlli.length)];
-    document.getElementById("checkText").innerText = testo;
+function startCheck(){
+    document.getElementById("blockStep").classList.add("hidden");
+    document.getElementById("checkStep").classList.remove("hidden");
+    nuovaDomanda();
+}
+
+function nuovaDomanda(){
+    domandaCorrente = domande[Math.floor(Math.random()*domande.length)];
+    document.getElementById("domanda").innerText = domandaCorrente.q;
+    document.getElementById("risposta").value = "";
+}
+
+function verificaRisposta(){
+    tentativo++;
+    const risposta = document.getElementById("risposta").value.trim().toLowerCase();
+
+    document.getElementById("tentativi").innerText =
+        "Tentativi effettuati: " + tentativo;
+
+    // anche se giusto, i primi tentativi falliscono apposta
+    if(tentativo < 4 || risposta !== domandaCorrente.a){
+        alert("❌ Verifica non superata. Riprovare.");
+        nuovaDomanda();
+    } else {
+        document.getElementById("checkStep").classList.add("hidden");
+        document.getElementById("finalStep").classList.remove("hidden");
+    }
 }
 </script>
 
