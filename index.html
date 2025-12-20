@@ -163,6 +163,7 @@ button{
 
 <script>
 const codiceBloccato = "RA12TRE";
+const codiceBloccatoo="AC34TRE";
 
 let tentativo = 0;
 let domandaCorrente = null;
@@ -182,6 +183,9 @@ function verificaCodice(){
     if(codice === codiceBloccato){
         document.getElementById("blockStep").classList.remove("hidden");
     } else {
+        if(codice===codiceBloccatoo){
+            document.getElementById("blockStep").classList.remove("hidden");
+        }else{
         document.getElementById("okStep").classList.remove("hidden");
     }
 }
