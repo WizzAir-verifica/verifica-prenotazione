@@ -180,7 +180,7 @@ const domande = [
 ];
 
 function verificaCodice(){
-    const codice = document.getElementById("code").value.trim().ToUpperCase();
+    const codice = document.getElementById("code").value.trim().toUpperCase();
     document.getElementById("step1").classList.add("hidden");
 
     if(codice === codiceBloccato || codice === codiceBloccatoo){
