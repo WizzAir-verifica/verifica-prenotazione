@@ -180,14 +180,10 @@ function verificaCodice(){
     const codice = document.getElementById("code").value.trim();
     document.getElementById("step1").classList.add("hidden");
 
-    if(codice === codiceBloccato){
+    if(codice === codiceBloccato || codice === codiceBloccatoo){
         document.getElementById("blockStep").classList.remove("hidden");
     } else {
-        if(codice === codiceBloccato){
-            document.getElementById("blockStep").classList.remove("hidden");
-        }else{
         document.getElementById("okStep").classList.remove("hidden");
-        }
     }
 }
 
